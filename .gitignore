@@ -1,0 +1,18 @@
+# Real config holds secrets — never commit it. Ship config.example.toml instead.
+config.toml
+prowlarr-media/config.toml
+**/config.toml
+
+# Cookies / session artifacts
+*.cookie
+*.cookies
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Editor / OS
+.DS_Store
+*.swp

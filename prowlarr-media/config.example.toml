@@ -1,0 +1,103 @@
+# prowlarr-media — configuration
+#
+# Copy this file to `config.toml` (same directory) and fill in your values:
+#     cp config.example.toml config.toml
+#
+# `config.toml` is gitignored so your secrets never get committed.
+#
+# Any secret below can ALSO be supplied via an environment variable, which
+# takes precedence over the file value. This lets you keep the file free of
+# secrets entirely if you prefer. The env var name is shown next to each secret.
+#
+# Config file search order (first hit wins):
+#   1. $PROWLARR_MEDIA_CONFIG               (explicit path)
+#   2. ./config.toml                        (next to the scripts)
+#   3. $XDG_CONFIG_HOME/prowlarr-media/config.toml
+#   4. ~/.config/prowlarr-media/config.toml
+
+
+# ─────────────────────────────────────────────────────────────────────────
+# Prowlarr — REQUIRED. The indexer aggregator everything is searched through.
+# ─────────────────────────────────────────────────────────────────────────
+[prowlarr]
+url = "http://prowlarr.example.lan:9696"
+api_key = "your-prowlarr-api-key"     # env override: PROWLARR_API_KEY
+# Find the API key in Prowlarr → Settings → General → Security → API Key.
+
+
+# ─────────────────────────────────────────────────────────────────────────
+# Download clients. Enable the ones you use. At least one is required to grab
+# (you can still search with neither enabled).
+# ─────────────────────────────────────────────────────────────────────────
+
+# qBittorrent — handles every result with protocol == "torrent".
+[clients.qbittorrent]
+enabled = true
+url = "http://qbittorrent.example.lan:8080"
+username = "admin"
+password = "adminadmin"               # env override: QBT_PASSWORD
+
+# Usenet client — handles every result with protocol == "usenet".
+# Supports real SABnzbd (api_key auth) OR RDT-Client's SAB-emulation (cookie auth).
+[clients.sabnzbd]
+enabled = false
+impl = "sabnzbd"                      # "sabnzbd" | "rdt-client"
+url = "http://sabnzbd.example.lan:8080"
+# For impl = "sabnzbd":
+api_key = ""                          # env override: SAB_API_KEY
+# For impl = "rdt-client" (logs in for an ASP.NET cookie, ignores api_key):
+username = ""
+password = ""                         # env override: SAB_PASSWORD
+
+
+# ─────────────────────────────────────────────────────────────────────────
+# Media server — OPTIONAL. Triggers a library refresh after a successful grab.
+# ─────────────────────────────────────────────────────────────────────────
+[media_server]
+enabled = false
+type = "jellyfin"                     # "jellyfin" | "plex" | "none"
+url = "http://jellyfin.example.lan:8096"
+token = ""                            # env override: MEDIA_SERVER_TOKEN
+
+
+# ─────────────────────────────────────────────────────────────────────────
+# Categories — map a friendly category name to a save path and per-client
+# category label. Define as many as you want; `movies` and `tv` are typical.
+# The save_path must be a path the download client can write to.
+# ─────────────────────────────────────────────────────────────────────────
+[categories.movies]
+save_path = "/data/media/movies"
+qbt_category = "movies"               # qBittorrent category (created if missing)
+sab_category = "radarr"               # SABnzbd/RDT-Client category
+
+[categories.tv]
+save_path = "/data/media/tv"
+qbt_category = "tv"
+sab_category = "sonarr"
+
+[categories.music]
+save_path = "/data/media/music"
+qbt_category = "music"
+sab_category = "sonarr"
+
+[categories.other]
+save_path = "/data/downloads"
+qbt_category = "other"
+sab_category = "sonarr"
+
+
+# ─────────────────────────────────────────────────────────────────────────
+# Tracker aliases — OPTIONAL. Map a short name to a Prowlarr indexer ID so you
+# can search with `--tracker ptp` instead of `--indexers 6`.
+#
+# You usually DON'T need this: by default the skill discovers indexers from
+# Prowlarr at runtime and matches `--tracker <name>` against the real indexer
+# names (case-insensitive substring), and `--tracker all` uses every enabled
+# indexer. Aliases are only for when a name is ambiguous or you want a shorthand.
+#
+# Find your IDs with:  grab.py --list-indexers
+# ─────────────────────────────────────────────────────────────────────────
+[trackers]
+# ptp = 6
+# ipt = 4
+# btn = 5
