@@ -35,6 +35,19 @@ docs/configuration.md      # end-user config reference
 .aidocs/design.md          # design notes & provenance
 ```
 
+## Commands
+
+Scripts are run from the skill directory (they read `config.toml` from cwd):
+
+```bash
+cp config.example.toml config.toml   # then edit
+./grab.py --show-config              # verify config resolves (no secrets printed)
+./grab.py --list-indexers            # live indexers from the configured Prowlarr
+./grab.py --query "Movie 2024 2160p" --tracker all --dry-run    # preview
+./grab.py --query "Show S01 1080p" --tracker btn --category tv  # grab
+./monitor.py --only-active           # status across both clients
+```
+
 ## Provenance
 
 Derived from the command-center `ipt` skill (kept untouched). Key generalizations:
@@ -42,6 +55,17 @@ hardcoded IPs/keys → `config.toml`; hardcoded indexer IDs → dynamic discover
 optional aliases; RDT-Client-only usenet → SABnzbd-or-RDT-Client via `impl`;
 duplicated session code in grab/monitor → shared `_clients.py`. The
 `indexerIds`-repeat fix (Prowlarr 400 on comma-joined IDs) is carried over.
+
+## Gotchas
+
+- **Same-dir imports.** `grab.py`/`monitor.py` use `import _config` / `from _clients`.
+  They must run from the skill dir (or have it on `sys.path`) — don't symlink a single
+  script elsewhere.
+- **Schema changes are a 3-file edit.** Any config key change must update
+  `config.example.toml`, `_config.py` (parsing/validation + the `_ENV_OVERRIDES` map),
+  and `docs/configuration.md` together.
+- **Secrets via env.** `PROWLARR_API_KEY`, `QBT_PASSWORD`, `SAB_API_KEY`, `SAB_PASSWORD`,
+  `MEDIA_SERVER_TOKEN` override file values (see `_ENV_OVERRIDES` in `_config.py`).
 
 ## Testing changes
 
