@@ -86,10 +86,19 @@ they run (and for an IP/hostname if not local).
 Default ports: Prowlarr `9696`, qBittorrent `8080`/`8081`, SABnzbd `8080`,
 Jellyfin `8096`, Plex `32400`.
 
+Use Python for this (it's already required, and unlike the bash `/dev/tcp`
+trick it works in every shell — `/dev/tcp` silently fails under zsh). Change
+`host` if the services aren't on this machine:
+
 ```bash
-for p in 9696 8080 8081 8096 32400; do
-  (exec 3<>/dev/tcp/127.0.0.1/$p) 2>/dev/null && echo "open: $p" && exec 3>&- || true
-done
+python3 - <<'PY'
+import socket
+host = "127.0.0.1"        # set to the services' IP/hostname if remote
+for p in (9696, 8080, 8081, 8096, 32400):
+    s = socket.socket(); s.settimeout(2)
+    print(f"{host}:{p}", "OPEN" if s.connect_ex((host, p)) == 0 else "closed")
+    s.close()
+PY
 ```
 
 ### Establish the base host
