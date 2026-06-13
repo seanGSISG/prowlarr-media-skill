@@ -123,12 +123,27 @@ entry. Tell the user whether the service is **required** (Prowlarr, plus at leas
 one download client) or **optional** (usenet client, media server) so they can
 decide to skip.
 
+### Install policy (important)
+
+- **You may offer to install any service EXCEPT Prowlarr** — qBittorrent, a
+  usenet client, a media server. If the user agrees, install it for them
+  (confirm OS / Docker-vs-native first; lean on the LinuxServer.io Docker images
+  for self-hosted setups), bring it up, then continue the ladder.
+- **Prowlarr is out of scope — do NOT install or configure it inline.** Standing
+  Prowlarr up means adding the user's *own private trackers* (logins,
+  invite-only indexers, per-tracker settings), which is personal and beyond this
+  tool. If Prowlarr is missing, **offer to research and walk them through
+  installing Prowlarr and configuring their trackers as a separate task**, then
+  resume this install once Prowlarr is running with at least one indexer.
+
 ### General ladder (any service)
 
 1. "Do you have **<service>** installed?"
-   - No, and it's **required** → explain it's needed; offer to point them at the
-     install docs, then pause until it's installed. Don't fabricate a config.
-   - No, and it's **optional** → set `enabled = false` for that section and move on.
+   - No, and it's **Prowlarr** → see the Prowlarr note above (out of scope; offer
+     to research/guide separately). Don't fabricate a config.
+   - No, and it's a **download client / media server** → **offer to install it for
+     them** (see install policy). If they decline an optional one, set
+     `enabled = false` and move on.
 2. "Is it **running** right now?" — help them check (`docker ps`, `systemctl status …`,
    or just open the web UI in a browser).
 3. "What **host** is it on — this machine, or another box (NAS/server)?" Get the
@@ -142,7 +157,9 @@ decide to skip.
 If you can't reach it, walk this ladder:
 
 1. "Is qBittorrent installed, and where — a Docker container, installed directly,
-   or on another machine?"
+   or on another machine?" If it's **not installed**, offer to install it for them
+   (e.g. the `lscr.io/linuxserver/qbittorrent` Docker image, or their distro's
+   package) — confirm the method first, install, start it, then continue.
 2. "Is the **Web UI enabled**?" Many desktop installs have it off by default.
    If unsure, guide them: qBittorrent → **Tools → Options → Web UI** → check
    **"Web User Interface (Remote control)"**, note the **port** (default 8080),
@@ -160,9 +177,11 @@ If you can't reach it, walk this ladder:
 
 ### Prowlarr (required)
 
-1. "Do you have Prowlarr installed and running?" It's the core of this tool — if
-   it's missing, stop and help them install it (or point at https://prowlarr.com)
-   before continuing.
+1. "Do you have Prowlarr installed and running?" It's the core of this tool. If
+   it's missing, **do not install/configure it inline** — that involves the
+   user's own private trackers and is out of scope. Offer instead to research and
+   walk them through installing Prowlarr and adding their trackers as a separate
+   task (https://prowlarr.com), then resume here once it's up with ≥1 indexer.
 2. "What address is its web UI on?" (default `:9696`). Verify it loads.
 3. API key: read it from `config.xml` (see Step 3) or ask them to copy it from
    **Settings → General → API Key**. If `--list-indexers` later 401s, the key or
@@ -173,6 +192,8 @@ If you can't reach it, walk this ladder:
 1. "Do you use **Usenet** at all? Plenty of setups are torrent-only." If no →
    leave `[clients.sabnzbd] enabled = false` and move on (don't push it).
 2. If yes: "Is it **real SABnzbd** or **RDT-Client** (SAB-emulation)?" → sets `impl`.
+   Not installed yet? Offer to install it for them (LinuxServer.io has images for
+   both), then continue.
 3. "What address?" (default `:8080` for SABnzbd).
 4. Credentials: SABnzbd → API key (Config → General, or read `sabnzbd.ini`);
    RDT-Client → the web username/password.
@@ -182,6 +203,9 @@ If you can't reach it, walk this ladder:
 1. "Do you want a **Jellyfin/Plex** library scan triggered automatically after a
    grab? It's optional." If no → leave `enabled = false`.
 2. If yes: "Jellyfin or Plex? What address?" (Jellyfin `:8096`, Plex `:32400`).
+   Most users who want this already run one; if they want it but don't have it,
+   you may offer to install it (LinuxServer.io images), though that's a bigger
+   side-task — skipping (`enabled = false`) is perfectly fine.
 3. Token: Jellyfin → **Dashboard → API Keys → +** (have them create and paste one);
    Plex → their `X-Plex-Token`.
 
