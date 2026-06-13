@@ -105,7 +105,93 @@ PY
 
 If everything is local, use `http://localhost` / `http://127.0.0.1`. If services
 live on another machine, ask for its IP/hostname once and reuse it. Note: you can
-only auto-read config files (below) on hosts you can reach a shell on.
+only auto-read config files (below) on hosts you can reach a shell on. Even
+without shell access you can still HTTP-probe a remote host (the python socket
+check above, or `curl`), so use that to confirm reachability before asking the
+user to type values.
+
+---
+
+## When a service isn't detected — what to ask
+
+**Don't give up or skip silently after the probes come back empty.** A "not
+found" almost always means one of: (a) not installed, (b) installed but not
+running, (c) running on a different host/port than you probed, or (d) running
+but its WebUI/API isn't enabled. Diagnose with a short, **one-question-at-a-time**
+ladder, then re-run the relevant detection command before falling back to manual
+entry. Tell the user whether the service is **required** (Prowlarr, plus at least
+one download client) or **optional** (usenet client, media server) so they can
+decide to skip.
+
+### General ladder (any service)
+
+1. "Do you have **<service>** installed?"
+   - No, and it's **required** → explain it's needed; offer to point them at the
+     install docs, then pause until it's installed. Don't fabricate a config.
+   - No, and it's **optional** → set `enabled = false` for that section and move on.
+2. "Is it **running** right now?" — help them check (`docker ps`, `systemctl status …`,
+   or just open the web UI in a browser).
+3. "What **host** is it on — this machine, or another box (NAS/server)?" Get the
+   IP/hostname if remote.
+4. "What **port** is its web UI on?" (offer the default).
+5. Re-probe with those answers (port check / `curl` the URL). Only ask for
+   credentials once you've confirmed something is actually listening.
+
+### qBittorrent (required, if torrenting)
+
+If you can't reach it, walk this ladder:
+
+1. "Is qBittorrent installed, and where — a Docker container, installed directly,
+   or on another machine?"
+2. "Is the **Web UI enabled**?" Many desktop installs have it off by default.
+   If unsure, guide them: qBittorrent → **Tools → Options → Web UI** → check
+   **"Web User Interface (Remote control)"**, note the **port** (default 8080),
+   and **Apply**.
+3. "What's the Web UI address?" → form `http://<host>:<port>`. Verify it loads.
+4. "What **username**?" (default `admin`).
+5. "What **password**?" If they don't know it:
+   - Newer qBittorrent generates a random temporary password on first run, printed
+     to the log: `docker logs <container> 2>&1 | grep -i 'temporary password'`
+     (or `journalctl`/the app log for bare-metal).
+   - Or have them set a known one in **Options → Web UI → Authentication**, Apply,
+     then use that.
+6. Confirm the creds work before writing them (a successful `--show-config` plus a
+   later grab will prove it; or test the login endpoint).
+
+### Prowlarr (required)
+
+1. "Do you have Prowlarr installed and running?" It's the core of this tool — if
+   it's missing, stop and help them install it (or point at https://prowlarr.com)
+   before continuing.
+2. "What address is its web UI on?" (default `:9696`). Verify it loads.
+3. API key: read it from `config.xml` (see Step 3) or ask them to copy it from
+   **Settings → General → API Key**. If `--list-indexers` later 401s, the key or
+   URL is wrong — re-ask.
+
+### Usenet client (optional)
+
+1. "Do you use **Usenet** at all? Plenty of setups are torrent-only." If no →
+   leave `[clients.sabnzbd] enabled = false` and move on (don't push it).
+2. If yes: "Is it **real SABnzbd** or **RDT-Client** (SAB-emulation)?" → sets `impl`.
+3. "What address?" (default `:8080` for SABnzbd).
+4. Credentials: SABnzbd → API key (Config → General, or read `sabnzbd.ini`);
+   RDT-Client → the web username/password.
+
+### Media server (optional — only for auto library refresh)
+
+1. "Do you want a **Jellyfin/Plex** library scan triggered automatically after a
+   grab? It's optional." If no → leave `enabled = false`.
+2. If yes: "Jellyfin or Plex? What address?" (Jellyfin `:8096`, Plex `:32400`).
+3. Token: Jellyfin → **Dashboard → API Keys → +** (have them create and paste one);
+   Plex → their `X-Plex-Token`.
+
+### If a value simply can't be obtained
+
+Set that section `enabled = false` (for optional services) and clearly tell the
+user what's missing and how to add it later by editing `config.toml` and
+re-running `./grab.py --show-config`. Never write a placeholder/guessed value
+into `config.toml` just to move on — a broken value is worse than a disabled
+section.
 
 ---
 
