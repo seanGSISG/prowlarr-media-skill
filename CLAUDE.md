@@ -1,11 +1,10 @@
 # prowlarr-media-skill
 
 <identity>
-A portable, shareable Claude Code skill — `prowlarr-media` — that searches any
-Prowlarr instance and grabs releases to qBittorrent (torrents) or
-SABnzbd/RDT-Client (usenet), with optional Jellyfin/Plex refresh. Generalized
-from a personal homelab skill so it works for any user's trackers with no code
-edits. Public repo: github.com/seanGSISG/prowlarr-media-skill.
+A Claude Code skill — `prowlarr-media` — that searches a Prowlarr instance and
+grabs releases to qBittorrent (torrents) or a usenet client, with optional
+media-server library refresh. Tracker-agnostic: indexers and all infra come
+from config, not code.
 </identity>
 
 <principles>
@@ -32,7 +31,6 @@ prowlarr-media/            # the skill (users copy into .claude/skills/)
 ├── monitor.py             # CLI: unified status
 └── references/            # prowlarr-internals, usenet-sabnzbd, indexer-discovery
 docs/configuration.md      # end-user config reference
-.aidocs/design.md          # design notes & provenance
 ```
 
 ## Commands
@@ -47,14 +45,6 @@ cp config.example.toml config.toml   # then edit
 ./grab.py --query "Show S01 1080p" --tracker btn --category tv  # grab
 ./monitor.py --only-active           # status across both clients
 ```
-
-## Provenance
-
-Derived from the command-center `ipt` skill (kept untouched). Key generalizations:
-hardcoded IPs/keys → `config.toml`; hardcoded indexer IDs → dynamic discovery +
-optional aliases; RDT-Client-only usenet → SABnzbd-or-RDT-Client via `impl`;
-duplicated session code in grab/monitor → shared `_clients.py`. The
-`indexerIds`-repeat fix (Prowlarr 400 on comma-joined IDs) is carried over.
 
 ## Gotchas
 

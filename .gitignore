@@ -13,6 +13,9 @@ __pycache__/
 .venv/
 venv/
 
+# Internal design/agent notes — not part of the shared skill
+.aidocs/
+
 # Editor / OS
 .DS_Store
 *.swp

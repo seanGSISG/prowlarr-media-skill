@@ -13,8 +13,7 @@ optional Jellyfin/Plex library refresh.
 - **Works with anyone's trackers.** Indexers are discovered from Prowlarr at
   runtime; reference them by name (`--tracker ptp`), `all`, or raw ID.
 
-> This is a generalized, shareable version of a personal homelab skill. It is
-> tracker-agnostic by design — bring your own Prowlarr and indexers.
+> Tracker-agnostic by design — bring your own Prowlarr and indexers.
 
 ## Install
 
