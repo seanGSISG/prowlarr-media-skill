@@ -189,7 +189,7 @@ If you can't reach it, walk this ladder:
 
 ### Usenet client (optional)
 
-1. "Do you use **Usenet** at all? Plenty of setups are torrent-only." If no →
+1. "Do you have a TorBox Pro subscription or use **Usenet** at all? Plenty of setups are torrent-only.  TorBox Pro includes free UseNet access" If no →
    leave `[clients.sabnzbd] enabled = false` and move on (don't push it).
 2. If yes: "Is it **real SABnzbd** or **RDT-Client** (SAB-emulation)?" → sets `impl`.
    Not installed yet? Offer to install it for them (LinuxServer.io has images for
