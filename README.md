@@ -15,20 +15,24 @@ optional Jellyfin/Plex library refresh.
 
 > Tracker-agnostic by design — bring your own Prowlarr and indexers.
 
-## Install
+## Install (easiest — let Claude Code do it)
 
-This is a Claude Code skill. Copy the `prowlarr-media/` directory into your
-skills folder:
+Open Claude Code and say:
+
+> Read the instructions at
+> https://github.com/seanGSISG/prowlarr-media-skill/blob/main/.aidocs/INSTALL.md
+> and help me install and configure this tool.
+
+Claude will clone the repo, install the skill, **auto-detect your existing
+Prowlarr / qBittorrent / usenet / media-server services**, and walk you through
+filling out the config interactively — verifying each step against your live
+setup. That's the whole install.
+
+### Manual install
 
 ```bash
 git clone https://github.com/seanGSISG/prowlarr-media-skill.git
 cp -r prowlarr-media-skill/prowlarr-media ~/.claude/skills/prowlarr-media
-# (or into a project's .claude/skills/ for project scope)
-```
-
-## Configure
-
-```bash
 cd ~/.claude/skills/prowlarr-media
 cp config.example.toml config.toml      # then edit it
 ./grab.py --show-config                  # verify it connects
@@ -36,7 +40,7 @@ cp config.example.toml config.toml      # then edit it
 ```
 
 At minimum you need the `[prowlarr]` section (url + api_key) and one download
-client. Secrets can be supplied via environment variables instead of the file
+client. Secrets can also come from environment variables instead of the file
 (`PROWLARR_API_KEY`, `QBT_PASSWORD`, `SAB_API_KEY`, `SAB_PASSWORD`,
 `MEDIA_SERVER_TOKEN`) — these override the file values. See
 [`docs/configuration.md`](docs/configuration.md) for the full schema.

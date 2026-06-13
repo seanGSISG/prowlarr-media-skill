@@ -13,8 +13,8 @@ __pycache__/
 .venv/
 venv/
 
-# Internal design/agent notes — not part of the shared skill
-.aidocs/
+# Internal design notes — not part of the shared skill (INSTALL.md IS shared)
+.aidocs/design.md
 
 # Editor / OS
 .DS_Store
